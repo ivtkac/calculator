@@ -1,30 +1,23 @@
 use std::{
     fmt::Display,
-    io::{self, Write},
-    ops::{Add, Div, Mul, Sub},
+    io::{Write, stdin, stdout},
     str::FromStr,
 };
 
-trait Calculator {
-    fn calculate(&self, a: f64, b: f64) -> f64;
-}
-
 enum Operator {
     Add,
-    Substract,
+    Sub,
     Multiply,
-    Divide,
-    Power,
+    Div,
 }
 
-impl Calculator for Operator {
+impl Operator {
     fn calculate(&self, a: f64, b: f64) -> f64 {
         match self {
-            Operator::Add => a.add(b),
-            Operator::Substract => a.sub(b),
-            Operator::Multiply => a.mul(b),
-            Operator::Divide => a.div(b),
-            Operator::Power => a.powf(b),
+            Self::Add => a + b,
+            Self::Sub => a - b,
+            Self::Multiply => a * b,
+            Self::Div => a / b,
         }
     }
 }
@@ -32,11 +25,10 @@ impl Calculator for Operator {
 impl Display for Operator {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Operator::Add => write!(f, "+"),
-            Operator::Substract => write!(f, "-"),
-            Operator::Multiply => write!(f, "*"),
-            Operator::Divide => write!(f, "/"),
-            Operator::Power => write!(f, "^"),
+            Self::Add => write!(f, "+"),
+            Self::Sub => write!(f, "-"),
+            Self::Multiply => write!(f, "*"),
+            Self::Div => write!(f, "/"),
         }
     }
 }
@@ -50,10 +42,9 @@ impl FromStr for Operator {
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
             "+" => Ok(Operator::Add),
-            "-" => Ok(Operator::Substract),
+            "-" => Ok(Operator::Sub),
             "*" => Ok(Operator::Multiply),
-            "/" => Ok(Operator::Divide),
-            "^" => Ok(Operator::Power),
+            "/" => Ok(Operator::Div),
             _ => Err(OperatorError),
         }
     }
@@ -61,9 +52,9 @@ impl FromStr for Operator {
 
 fn input(prompt: &str) -> String {
     println!("{prompt}");
-    io::stdout().flush().expect("Failed to flush stdout!");
+    stdout().flush().expect("Failed to flush stdout!");
     let mut buffer = String::new();
-    io::stdin()
+    stdin()
         .read_line(&mut buffer)
         .expect("Failed to read line!");
     buffer.trim().to_string()
@@ -74,14 +65,15 @@ fn main() {
         .parse()
         .expect("Failed to parse a number!");
 
-    let operation = input("Input operation (+,-,*,/,^): ")
-        .parse::<Operator>()
-        .expect("Failed to parse a operator!");
-
-    let b: f64 = input("Input second number: ")
+    let b = input("Input second number: ")
         .parse()
         .expect("Failed to parse a number!");
 
+    let operation = input("Input operation (+,-,*,/): ")
+        .parse::<Operator>()
+        .expect("Failed to parse a operator!");
+
     let result = operation.calculate(a, b);
-    println!("{a} {operation} {b} = {result}");
+    println!("{a}{operation}{b}={result}");
 }
+
